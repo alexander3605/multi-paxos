@@ -1,0 +1,481 @@
+# Leszek Nowaczyk (lkn16) and Alessandro Serena (as6316)
+===============================
+1.  delay
+===============================
+
+1)  0 ms DELAY      (--> ends up in LIVE-LOCK)
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 500,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  10_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        0   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 70000  updates done = [{1, 521}, {2, 521}, {3, 521}]
+    time = 70000 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+    time = 70000    total seen = 1000 current lag = 479, max lag = 694
+    time = 70000        scouts = [{1, 0}, {2, 0}, {3, 1}]
+    time = 70000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 80000  updates done = [{1, 542}, {2, 542}, {3, 542}]
+    time = 80000 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+    time = 80000    total seen = 1000 current lag = 458, max lag = 694
+    time = 80000        scouts = [{1, 1}, {2, 0}, {3, 0}]
+    time = 80000    commanders = [{1, 0}, {2, 7}, {3, 0}]
+
+    time = 120000  updates done = [{1, 542}, {2, 542}, {3, 542}]
+    time = 120000 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+    time = 120000    total seen = 1000 current lag = 458, max lag = 694
+    time = 120000        scouts = [{1, 1}, {2, 0}, {3, 0}]
+    time = 120000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+2)  100 ms MAX_DELAY    (--> finishes in 3.5 seconds)
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 500,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  500,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 1000  updates done = [{1, 319}, {2, 320}, {3, 320}]
+    time = 1000 requests seen = [{1, 108}, {2, 108}, {3, 109}]
+    time = 1000    total seen = 325 current lag = 6, max lag = 6
+    time = 1000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 1000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 2000  updates done = [{1, 626}, {2, 626}, {3, 626}]
+    time = 2000 requests seen = [{1, 208}, {2, 208}, {3, 210}]
+    time = 2000    total seen = 626 current lag = 0, max lag = 7
+    time = 2000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 2000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 3500  updates done = [{1, 1000}, {2, 1000}, {3, 1000}]
+    time = 3500 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+    time = 3500    total seen = 1000 current lag = 0, max lag = 15
+    time = 3500        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 3500    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+3) 10_000 ms MAX_DELAY    (--> finishes in 3 seconds)
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 500,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  500,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        10_000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 1000  updates done = [{1, 391}, {2, 391}, {3, 391}]
+    time = 1000 requests seen = [{1, 130}, {2, 130}, {3, 131}]
+    time = 1000    total seen = 391 current lag = 0, max lag = 0
+    time = 1000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 1000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 2000  updates done = [{1, 792}, {2, 792}, {3, 792}]
+    time = 2000 requests seen = [{1, 264}, {2, 264}, {3, 264}]
+    time = 2000    total seen = 792 current lag = 0, max lag = 0
+    time = 2000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 2000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 3000  updates done = [{1, 1000}, {2, 1000}, {3, 1000}]
+    time = 3000 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+    time = 3000    total seen = 1000 current lag = 0, max lag = 0
+    time = 3000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 3000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+
+
+===============================
+2.  broadcast method
+===============================
+
+1) ROUND ROBIN 
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1000,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:  :round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 1000  updates done = [{1, 323}, {2, 323}, {3, 323}]
+    time = 1000 requests seen = [{1, 108}, {2, 107}, {3, 108}]
+    time = 1000    total seen = 323 current lag = 0, max lag = 0
+    time = 1000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 1000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 3000  updates done = [{1, 992}, {2, 992}, {3, 992}]
+    time = 3000 requests seen = [{1, 330}, {2, 330}, {3, 332}]
+    time = 3000    total seen = 992 current lag = 0, max lag = 0
+    time = 3000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 3000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 7000  updates done = [{1, 2000}, {2, 2000}, {3, 2000}]
+    time = 7000 requests seen = [{1, 666}, {2, 666}, {3, 668}]
+    time = 7000    total seen = 2000 current lag = 0, max lag = 0
+    time = 7000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 7000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+2)  QUORUM
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1000,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:  :quorum,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 1000  updates done = [{1, 323}, {2, 323}, {3, 323}]
+    time = 1000 requests seen = [{1, 216}, {2, 215}, {3, 215}]
+    time = 1000    total seen = 323 current lag = 0, max lag = 0
+    time = 1000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 1000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 3000  updates done = [{1, 992}, {2, 992}, {3, 992}]
+    time = 3000 requests seen = [{1, 662}, {2, 660}, {3, 662}]
+    time = 3000    total seen = 992 current lag = 0, max lag = 0
+    time = 3000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 3000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 7000  updates done = [{1, 2000}, {2, 2000}, {3, 2000}]
+    time = 7000 requests seen = [{1, 1334}, {2, 1332}, {3, 1334}]
+    time = 7000    total seen = 2000 current lag = 0, max lag = 0
+    time = 7000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 7000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+3)  BROADCAST
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1000,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:  :broadcast,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 1000  updates done = [{1, 323}, {2, 323}, {3, 323}]
+    time = 1000 requests seen = [{1, 323}, {2, 323}, {3, 323}]
+    time = 1000    total seen = 323 current lag = 0, max lag = 0
+    time = 1000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 1000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 3000  updates done = [{1, 993}, {2, 993}, {3, 993}]
+    time = 3000 requests seen = [{1, 993}, {2, 993}, {3, 993}]
+    time = 3000    total seen = 993 current lag = 0, max lag = 0
+    time = 3000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 3000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 7000  updates done = [{1, 2000}, {2, 2000}, {3, 2000}]
+    time = 7000 requests seen = [{1, 2000}, {2, 2000}, {3, 2000}]
+    time = 7000    total seen = 2000 current lag = 0, max lag = 0
+    time = 7000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 7000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+
+
+===============================
+3.  clients - servers number
+===============================
+
+1)  7 SERVERS - 4 CLIENTS
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1000,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        1000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 1000  updates done = [{1, 625}, {2, 625}, {3, 625}, {4, 625}, {5, 625},{6, 625}, {7, 625}]
+    time = 1000 requests seen = [{1, 88}, {2, 88}, {3, 92}, {4, 91}, {5, 90}, {6, 88}, {7, 88}]
+    time = 1000    total seen = 625 current lag = 0, max lag = 0
+    time = 1000        scouts = [{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}]
+    time = 1000    commanders = [{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}]
+
+    time = 3000  updates done = [{1, 1942}, {2, 1942}, {3, 1942}, {4, 1942}, {5, 1942}, {6, 1942}, {7, 1942}]
+    time = 3000 requests seen = [{1, 276}, {2, 276}, {3, 280}, {4, 280}, {5, 278},{6, 276}, {7, 276}]
+    time = 3000    total seen = 1942 current lag = 0, max lag = 1
+    time = 3000        scouts = [{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}]
+    time = 3000    commanders = [{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}]
+
+    time = 7000  updates done = [{1, 4000}, {2, 4000}, {3, 4000}, {4, 4000}, {5, 4000}, {6,4000}, {7, 4000}]
+    time = 7000 requests seen = [{1, 572}, {2, 568}, {3, 572}, {4, 572}, {5, 572}, {6, 572}, {7, 572}]
+    time = 7000    total seen = 4000 current lag = 0, max lag = 1
+    time = 7000        scouts = [{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}]
+    time = 7000    commanders = [{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}]
+
+
+
+2)  4 SERVERS - 150 CLIENTS
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 100,		# max requests each client will make
+    client_sleep: 3,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:    :quorum,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 5000  updates done = [{1, 9758}, {2, 9733}, {3, 9610}, {4, 9630}]
+    time = 5000 requests seen = [{1, 7500}, {2, 7500}, {3, 7500}, {4, 7500}]
+    time = 5000    total seen = 15000 current lag = 5390, max lag = 9086
+    time = 5000        scouts = [{1, 0}, {2, 0}, {3, 0}, {4, 0}]
+    time = 5000    commanders = [{1, 0}, {2, 0}, {3, 0}, {4, 0}]
+
+    time = 14000  updates done = [{1, 13015}, {2, 13032}, {3, 13027}, {4, 12703}]
+    time = 14000 requests seen = [{1, 7500}, {2, 7500}, {3, 7500}, {4, 7500}]
+    time = 14000    total seen = 15000 current lag = 2297, max lag = 9086
+    time = 14000        scouts = [{1, 0}, {2, 0}, {3, 0}, {4, 0}]
+    time = 14000    commanders = [{1, 0}, {2, 0}, {3, 0}, {4, 0}]
+
+    time = 27000  updates done = [{1, 15000}, {2, 15000}, {3, 15000}, {4, 15000}]
+    time = 27000 requests seen = [{1, 7500}, {2, 7500}, {3, 7500}, {4, 7500}]
+    time = 27000    total seen = 15000 current lag = 0, max lag = 9086
+    time = 27000        scouts = [{1, 0}, {2, 0}, {3, 0}, {4, 0}]
+    time = 27000    commanders = [{1, 0}, {2, 0}, {3, 0}, {4, 0}]
+
+
+
+3)  2 SERVERS - 10 CLIENTS
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1_000,		# max requests each client will make
+    client_sleep: 1,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 1000  updates done = [{1, 4688}, {2, 4679}]
+    time = 1000 requests seen = [{1, 2389}, {2, 2379}]
+    time = 1000    total seen = 4768 current lag = 89, max lag = 89
+    time = 1000        scouts = [{1, 0}, {2, 0}]
+    time = 1000    commanders = [{1, 0}, {2, 0}]
+
+    time = 2000  updates done = [{1, 7968}, {2, 7993}]
+    time = 2000 requests seen = [{1, 4875}, {2, 4895}]
+    time = 2000    total seen = 9770 current lag = 1802, max lag = 1802
+    time = 2000        scouts = [{1, 0}, {2, 0}]
+    time = 2000    commanders = [{1, 0}, {2, 0}]
+
+    time = 3000  updates done = [{1, 10000}, {2, 10000}]
+    time = 3000 requests seen = [{1, 5000}, {2, 5000}]
+    time = 3000    total seen = 10000 current lag = 0, max lag = 1802
+    time = 3000        scouts = [{1, 0}, {2, 0}]
+    time = 3000    commanders = [{1, 0}, {2, 0}]
+
+
+
+
+
+===============================
+4.  sending rate
+===============================
+
+1) 25_000 REQUESTS x 3 CLIENTS - 1 ms SLEEP
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 25_000,		# max requests each client will make
+    client_sleep: 1,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  15_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        1000000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 45000  updates done = [{1, 36451}, {2, 32804}, {3, 34223}]
+    time = 45000 requests seen = [{1, 22472}, {2, 18131}, {3, 19592}]
+    time = 45000    total seen = 60195 current lag = 27391, max lag = 27391
+    time = 45000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 45000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 120000  updates done = [{1, 55438}, {2, 55428}, {3, 55399}]
+    time = 120000 requests seen = [{1, 24999}, {2, 24999}, {3, 25002}]
+    time = 120000    total seen = 75000 current lag = 19601, max lag = 36615
+    time = 120000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 120000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 255000  updates done = [{1, 75000}, {2, 75000}, {3, 75000}]
+    time = 255000 requests seen = [{1, 24999}, {2, 24999}, {3, 25002}]
+    time = 255000    total seen = 75000 current lag = 0, max lag = 36615
+    time = 255000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 255000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+2) 1_000 REQUESTS x 30 CLIENTS - 10 ms SLEEP
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1_000,		# max requests each client will make
+    client_sleep: 10,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  5_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        1000000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 10000  updates done = [{1, 17028}, {2, 17108}, {3, 17531}]
+    time = 10000 requests seen = [{1, 8606}, {2, 8652}, {3, 8986}]
+    time = 10000    total seen = 26244 current lag = 9216, max lag = 9216
+    time = 10000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 10000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 20000  updates done = [{1, 24053}, {2, 24044}, {3, 24053}]
+    time = 20000 requests seen = [{1, 9990}, {2, 9990}, {3, 10020}]
+    time = 20000    total seen = 30000 current lag = 5956, max lag = 9340
+    time = 20000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 20000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 35000  updates done = [{1, 30000}, {2, 30000}, {3, 30000}]
+    time = 35000 requests seen = [{1, 9990}, {2, 9990}, {3, 10020}]
+    time = 35000    total seen = 30000 current lag = 0, max lag = 9340
+    time = 35000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 35000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+3) 10 REQUESTS x 5000 CLIENTS - 1 ms SLEEP
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 10,		# max requests each client will make
+    client_sleep: 1,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  5_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        1000000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 30000  updates done = [{1, 28628}, {2, 28547}, {3, 29759}]
+    time = 30000 requests seen = [{1, 14025}, {2, 13965}, {3, 19962}]
+    time = 30000    total seen = 47952 current lag = 19405, max lag = 19405
+    time = 30000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 30000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 60000  updates done = [{1, 41561}, {2, 41557}, {3, 41559}]
+    time = 60000 requests seen = [{1, 15000}, {2, 15000}, {3, 20000}]
+    time = 60000    total seen = 50000 current lag = 8443, max lag = 19405
+    time = 60000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 60000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    time = 90000  updates done = [{1, 50000}, {2, 50000}, {3, 50000}]
+    time = 90000 requests seen = [{1, 15000}, {2, 15000}, {3, 20000}]
+    time = 90000    total seen = 50000 current lag = 0, max lag = 19405
+    time = 90000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    time = 90000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+
+
+===============================
+5.  loads of commanders
+===============================
+
+1) NO DELAY AFTER 'PREEMPTED'
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1_000,		# max requests each client will make
+    client_sleep: 1,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:  :round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       1,   # when window = 1, it is equivelent to not having a window
+    delay:        0   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    time = 14000  updates done = [{1, 105}, {2, 105}, {3, 105}]
+    time = 14000 requests seen = [{1, 666}, {2, 666}, {3, 668}]
+    time = 14000    total seen = 2000 current lag = 1895, max lag = 1961
+    time = 14000        scouts = [{1, 0}, {2, 2}, {3, 0}]
+    time = 14000    commanders = [{1, 19}, {2, 0}, {3, 0}]
+
+    time = 15000  updates done = [{1, 128}, {2, 128}, {3, 128}]
+    time = 15000 requests seen = [{1, 666}, {2, 666}, {3, 668}]
+    time = 15000    total seen = 2000 current lag = 1872, max lag = 1961
+    time = 15000        scouts = [{1, 1}, {2, 0}, {3, 0}]
+    time = 15000    commanders = [{1, 0}, {2, 0}, {3, 129}]
+
+    time = 16000  updates done = [{1, 132}, {2, 132}, {3, 132}]
+    time = 16000 requests seen = [{1, 666}, {2, 666}, {3, 668}]
+    time = 16000    total seen = 2000 current lag = 1868, max lag = 1961
+    time = 16000        scouts = [{1, 0}, {2, 1}, {3, 1}]
+    time = 16000    commanders = [{1, 27}, {2, 0}, {3, 0}]
+

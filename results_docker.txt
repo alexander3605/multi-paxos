@@ -1,0 +1,445 @@
+# Leszek Nowaczyk (lkn16) and Alessandro Serena (as6316)
+===============================
+1.  delay
+===============================
+
+1)  0 ms DELAY      (--> ends up in LIVE-LOCK)
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 500,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  10_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        0   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    multipaxos                | time = 70000  updates done = [{1, 700}, {2, 700}, {3, 700}]
+    multipaxos                | time = 70000 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+    multipaxos                | time = 70000    total seen = 1000 current lag = 300, max lag = 711
+    multipaxos                | time = 70000        scouts = [{1, 0}, {2, 1}, {3, 2}]
+    multipaxos                | time = 70000    commanders = [{1, 627}, {2, 0}, {3, 0}]
+     
+    multipaxos                | time = 80000  updates done = [{1, 710}, {2, 710}, {3, 710}]
+    multipaxos                | time = 80000 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+    multipaxos                | time = 80000    total seen = 1000 current lag = 290, max lag = 711
+    multipaxos                | time = 80000        scouts = [{1, 1}, {2, 0}, {3, 0}]
+    multipaxos                | time = 80000    commanders = [{1, 554}, {2, 0}, {3, 0}]
+    
+    multipaxos                | time = 90000  updates done = [{1, 710}, {2, 710}, {3, 710}]
+    multipaxos                | time = 90000 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+    multipaxos                | time = 90000    total seen = 1000 current lag = 290, max lag = 711
+    multipaxos                | time = 90000        scouts = [{1, 0}, {2, 0}, {3, 1}]
+    multipaxos                | time = 90000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+
+
+2)  100 ms MAX_DELAY    (--> ends up in LIVE-LOCK)
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 500,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  500,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+multipaxos                | time = 85500  updates done = [{1, 844}, {2, 844}, {3, 844}]
+multipaxos                | time = 85500 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+multipaxos                | time = 85500    total seen = 1000 current lag = 156, max lag = 627
+multipaxos                | time = 85500        scouts = [{1, 0}, {2, 0}, {3, 0}]
+multipaxos                | time = 85500    commanders = [{1, 22}, {2, 532}, {3, 51}]
+
+multipaxos                | time = 86000  updates done = [{1, 854}, {2, 854}, {3, 854}]
+multipaxos                | time = 86000 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+multipaxos                | time = 86000    total seen = 1000 current lag = 146, max lag = 627
+multipaxos                | time = 86000        scouts = [{1, 0}, {2, 1}, {3, 1}]
+multipaxos                | time = 86000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+multipaxos                | time = 107500  updates done = [{1, 854}, {2, 854}, {3, 854}]
+multipaxos                | time = 107500 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+multipaxos                | time = 107500    total seen = 1000 current lag = 146, max lag = 627
+multipaxos                | time = 107500        scouts = [{1, 0}, {2, 0}, {3, 1}]
+multipaxos                | time = 107500    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+
+
+3) 10_000 ms MAX_DELAY    (--> finishes in 3.5 seconds)
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 500,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  500,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        10_000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    multipaxos                | time = 1000  updates done = [{1, 308}, {2, 308}, {3, 308}]
+    multipaxos                | time = 1000 requests seen = [{1, 103}, {2, 102}, {3, 103}]
+    multipaxos                | time = 1000    total seen = 308 current lag = 0, max lag = 1
+    multipaxos                | time = 1000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 1000    commanders = [{3, 0}]
+
+    multipaxos                | time = 2000  updates done = [{1, 642}, {2, 642}, {3, 642}]
+    multipaxos                | time = 2000 requests seen = [{1, 214}, {2, 213}, {3, 215}]
+    multipaxos                | time = 2000    total seen = 642 current lag = 0, max lag = 1
+    multipaxos                | time = 2000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 2000    commanders = [{2, 0}, {3, 0}]
+
+    multipaxos                | time = 3500  updates done = [{1, 1000}, {2, 1000}, {3, 1000}]
+    multipaxos                | time = 3500 requests seen = [{1, 334}, {2, 332}, {3, 334}]
+    multipaxos                | time = 3500    total seen = 1000 current lag = 0, max lag = 1
+    multipaxos                | time = 3500        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 3500    commanders = [{2, 0}, {3, 0}]
+
+
+
+
+
+
+
+
+===============================
+2.  broadcast method
+===============================
+
+1) ROUND ROBIN 
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1000,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:  :round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    multipaxos                | time = 1000  updates done = [{1, 283}, {2, 283}, {3, 283}]
+    multipaxos                | time = 1000 requests seen = [{1, 94}, {2, 94}, {3, 95}]
+    multipaxos                | time = 1000    total seen = 283 current lag = 0, max lag = 0
+    multipaxos                | time = 1000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 1000    commanders = [{2, 0}, {3, 0}]
+
+    multipaxos                | time = 3000  updates done = [{1, 953}, {2, 953}, {3, 953}]
+    multipaxos                | time = 3000 requests seen = [{1, 318}, {2, 317}, {3, 318}]
+    multipaxos                | time = 3000    total seen = 953 current lag = 0, max lag = 0
+    multipaxos                | time = 3000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 3000    commanders = [{2, 0}, {3, 0}]
+
+    multipaxos                | time = 7000  updates done = [{1, 2000}, {2, 2000}, {3, 2000}]
+    multipaxos                | time = 7000 requests seen = [{1, 666}, {2, 666}, {3, 668}]
+    multipaxos                | time = 7000    total seen = 2000 current lag = 0, max lag = 0
+    multipaxos                | time = 7000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 7000    commanders = [{2, 0}, {3, 0}]
+
+
+
+
+2)  QUORUM
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1000,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:  :quorum,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    multipaxos                | time = 1000  updates done = [{1, 284}, {2, 284}, {3, 284}]
+    multipaxos                | time = 1000 requests seen = [{1, 190}, {2, 189}, {3, 189}]
+    multipaxos                | time = 1000    total seen = 284 current lag = 0, max lag = 0
+    multipaxos                | time = 1000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 1000    commanders = [{2, 0}, {3, 0}]
+
+    multipaxos                | time = 3000  updates done = [{1, 954}, {2, 954}, {3, 954}]
+    multipaxos                | time = 3000 requests seen = [{1, 637}, {2, 635}, {3, 636}]
+    multipaxos                | time = 3000    total seen = 954 current lag = 0, max lag = 1
+    multipaxos                | time = 3000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 3000    commanders = [{2, 0}, {3, 0}]
+
+    multipaxos                | time = 7000  updates done = [{1, 2000}, {2, 2000}, {3, 2000}]
+    multipaxos                | time = 7000 requests seen = [{1, 1334}, {2, 1332}, {3, 1334}]
+    multipaxos                | time = 7000    total seen = 2000 current lag = 0, max lag = 1
+    multipaxos                | time = 7000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 7000    commanders = [{2, 0}, {3, 0}]
+
+
+
+
+3)  BROADCAST
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1000,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:  :broadcast,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    multipaxos                | time = 1000  updates done = [{1, 274}, {2, 274}, {3, 274}]
+    multipaxos                | time = 1000 requests seen = [{1, 274}, {2, 274}, {3, 274}]
+    multipaxos                | time = 1000    total seen = 274 current lag = 0, max lag = 0
+    multipaxos                | time = 1000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 1000    commanders = [{2, 0}, {3, 0}]
+
+    multipaxos                | time = 3000  updates done = [{1, 948}, {2, 948}, {3, 948}]
+    multipaxos                | time = 3000 requests seen = [{1, 948}, {2, 948}, {3, 948}]
+    multipaxos                | time = 3000    total seen = 948 current lag = 0, max lag = 0
+    multipaxos                | time = 3000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 3000    commanders = [{2, 0}, {3, 0}]
+
+    multipaxos                | time = 7000  updates done = [{1, 2000}, {2, 2000}, {3, 2000}]
+    multipaxos                | time = 7000 requests seen = [{1, 2000}, {2, 2000}, {3, 2000}]
+    multipaxos                | time = 7000    total seen = 2000 current lag = 0, max lag = 2
+    multipaxos                | time = 7000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 7000    commanders = [{2, 0}, {3, 0}]
+
+
+
+
+
+
+===============================
+3.  clients - servers number
+===============================
+
+1)  7 SERVERS - 4 CLIENTS
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1000,		# max requests each client will make
+    client_sleep: 5,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    multipaxos                | time = 6000  updates done = [{1, 1527}, {2, 1551}, {3, 1543}, {4, 1528}, {5, 1535}, {6, 1543}, {7, 1533}]
+    multipaxos                | time = 6000 requests seen = [{1, 272}, {2, 272}, {3, 275}, {4, 273}, {5, 274}, {6, 273}, {7, 272}]
+    multipaxos                | time = 6000    total seen = 1911 current lag = 384, max lag = 384
+    multipaxos                | time = 6000        scouts = [{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}]
+    multipaxos                | time = 6000    commanders = [{7, 0}]
+
+    multipaxos                | time = 15000  updates done = [{1, 3394}, {2, 3400}, {3, 3390}, {4, 3400}, {5, 3383}, {6, 3400}, {7, 3393}]
+    multipaxos                | time = 15000 requests seen = [{1, 572}, {2, 568}, {3, 572}, {4, 572}, {5, 572}, {6, 572}, {7, 572}]
+    multipaxos                | time = 15000    total seen = 4000 current lag = 617, max lag = 1002
+    multipaxos                | time = 15000        scouts = [{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}]
+    multipaxos                | time = 15000    commanders = [{7, 2}]
+
+    multipaxos                | time = 23000  updates done = [{1, 4000}, {2, 4000}, {3, 4000}, {4, 4000}, {5, 4000}, {6, 4000}, {7, 4000}]
+    multipaxos                | time = 23000 requests seen = [{1, 572}, {2, 568}, {3, 572}, {4, 572}, {5, 572}, {6, 572}, {7, 572}]
+    multipaxos                | time = 23000    total seen = 4000 current lag = 0, max lag = 1002
+    multipaxos                | time = 23000        scouts = [{1, 0}, {2, 0}, {3, 0}, {4, 0}, {5, 0}, {6, 0}, {7, 0}]
+    multipaxos                | time = 23000    commanders = [{4, 0}, {7, 0}]
+
+
+
+2)  4 SERVERS - 150 CLIENTS
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 100,		# max requests each client will make
+    client_sleep: 3,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:    :quorum,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    UNABLE TO RUN IN DOCKER, SETUP TIME TOO LONG (too many Docker containers required)
+
+
+
+3)  2 SERVERS - 10 CLIENTS
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1_000,		# max requests each client will make
+    client_sleep: 1,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        100000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    multipaxos                | time = 6000  updates done = [{1, 2873}, {2, 2879}]
+    multipaxos                | time = 6000 requests seen = [{1, 5000}, {2, 5000}]
+    multipaxos                | time = 6000    total seen = 10000 current lag = 7127, max lag = 7813
+    multipaxos                | time = 6000        scouts = [{1, 0}, {2, 0}]
+    multipaxos                | time = 6000    commanders = [{2, 10}]
+
+    multipaxos                | time = 15000  updates done = [{1, 7616}, {2, 7621}]
+    multipaxos                | time = 15000 requests seen = [{1, 5000}, {2, 5000}]
+    multipaxos                | time = 15000    total seen = 10000 current lag = 2384, max lag = 7813
+    multipaxos                | time = 15000        scouts = [{1, 0}, {2, 0}]
+    multipaxos                | time = 15000    commanders = [{2, 5}]
+
+    multipaxos                | time = 24000  updates done = [{1, 10000}, {2, 10000}]
+    multipaxos                | time = 24000 requests seen = [{1, 5000}, {2, 5000}]
+    multipaxos                | time = 24000    total seen = 10000 current lag = 0, max lag = 7813
+    multipaxos                | time = 24000        scouts = [{1, 0}, {2, 0}]
+    multipaxos                | time = 24000    commanders = [{2, 0}]
+
+
+
+
+
+
+===============================
+4.  sending rate
+===============================
+
+1) 25_000 REQUESTS x 3 CLIENTS - 1 ms SLEEP
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 25_000,		# max requests each client will make
+    client_sleep: 1,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  15_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        1000000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    multipaxos                | time = 45000  updates done = [{1, 11604}, {2, 11156}, {3, 11412}]
+    multipaxos                | time = 45000 requests seen = [{1, 12210}, {2, 11191}, {3, 11727}]
+    multipaxos                | time = 45000    total seen = 35128 current lag = 23972, max lag = 23972
+    multipaxos                | time = 45000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 45000    commanders = [{1, 10}, {2, 0}, {3, 0}]
+
+    multipaxos                | time = 315000  updates done = [{1, 32280}, {2, 32280}, {3, 32251}]
+    multipaxos                | time = 315000 requests seen = [{1, 16131}, {2, 16128}, {3, 16131}]
+    multipaxos                | time = 315000    total seen = 48390 current lag = 16139, max lag = 34092
+    multipaxos                | time = 315000        scouts = [{1, 0}, {2, 0}, {3, 0}]
+    multipaxos                | time = 315000    commanders = [{1, 0}, {2, 0}, {3, 30719}]
+
+    multipaxos                | time = 675000  updates done = [{1, 48390}, {2, 48390}, {3, 48390}]
+    multipaxos                | time = 675000 requests seen = [{1, 16131}, {2, 16128}, {3, 16131}]
+    multipaxos                | time = 675000    total seen = 48390 current lag = 0, max lag = 34092
+    multipaxos                | time = 675000        scouts = [{1, 1}, {2, 0}, {3, 0}]
+    multipaxos                | time = 675000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+
+
+2) 1_000 REQUESTS x 30 CLIENTS - 10 ms SLEEP
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1_000,		# max requests each client will make
+    client_sleep: 10,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  5_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        1000000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    COULD NOT RUN IN DOCKER - PROCESSES GET KILLED
+
+
+
+3) 10 REQUESTS x 5000 CLIENTS - 1 ms SLEEP
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 10,		# max requests each client will make
+    client_sleep: 1,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:	:round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  5_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       10,   # when window = 1, it is equivelent to not having a window
+    delay:        1000000   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    TOO MANY DOCKER CONTAINERS - COULD NOT RUN
+
+
+
+
+
+===============================
+5.  loads of commanders
+===============================
+
+1) NO DELAY AFTER 'PREEMPTED'   (--> executions slows down and approaches live-lock)
+
+    debug_level:  0, 		# debug level 0
+    docker_delay: 1_000,		# time (ms) to wait for containers to start up
+    max_requests: 1_000,		# max requests each client will make
+    client_sleep: 1,		# time (ms) to sleep before sending new request
+    client_stop:  60_000,		# time (ms) to stop sending further requests
+    client_send:  :round_robin,	# :round_robin, :quorum or :broadcast
+    n_accounts:   100,		# number of active bank accounts
+    max_amount:   1_000,		# max amount moved between accounts
+    print_after:  1_000,		# print transaction log summary every print_after msecs
+    crash_server: %{},
+    window:       1,   # when window = 1, it is equivelent to not having a window
+    delay:        0   # random delay from 0 to 'delay' when the leader is preemted (0 means no delay)
+    --------------------------------------------------------------------
+    multipaxos                | time = 156000  updates done = [{1, 415}, {2, 416}, {3, 416}]
+    multipaxos                | time = 156000 requests seen = [{1, 666}, {2, 666}, {3, 668}]
+    multipaxos                | time = 156000    total seen = 2000 current lag = 1585, max lag = 1845
+    multipaxos                | time = 156000        scouts = [{1, 1}, {2, 1}, {3, 0}]
+    multipaxos                | time = 156000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    multipaxos                | time = 157000  updates done = [{1, 416}, {2, 416}, {3, 416}]
+    multipaxos                | time = 157000 requests seen = [{1, 666}, {2, 666}, {3, 668}]
+    multipaxos                | time = 157000    total seen = 2000 current lag = 1584, max lag = 1845
+    multipaxos                | time = 157000        scouts = [{1, 0}, {2, 0}, {3, 2}]
+    multipaxos                | time = 157000    commanders = [{1, 0}, {2, 0}, {3, 0}]
+
+    multipaxos                | time = 164000  updates done = [{1, 416}, {2, 416}, {3, 416}]
+    multipaxos                | time = 164000 requests seen = [{1, 666}, {2, 666}, {3, 668}]
+    multipaxos                | time = 164000    total seen = 2000 current lag = 1584, max lag = 1845
+    multipaxos                | time = 164000        scouts = [{1, 1}, {2, 0}, {3, 0}]
+    multipaxos                | time = 164000    commanders = [{1, 0}, {2, 0}, {3, 289}]
+
+
